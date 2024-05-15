@@ -13,7 +13,6 @@ import torch.nn.functional as F
 # from torch._six import string_classes
 from torch.utils.data.dataloader import default_collate
 import logging
-from create_dictionary import Dictionary
 import itertools
 import _pickle as cPickle
 import json
@@ -231,79 +230,3 @@ def get_size_of_largest_vqa_batch(dataloader):
     for i, (v, b, q, a) in enumerate(dataloader):
         if largest_v > v.size()[1]:
             pass
-
-
-def tfidf_loading(use_tfidf, w_emb, args):
-    if use_tfidf:
-        if args.use_data:
-            dict = Dictionary.load_from_file(os.path.join(args.data_dir, 'dictionary.pkl'))
-
-        # load extracted tfidf and weights from file for saving loading time
-        if args.use_data:
-            if os.path.isfile(os.path.join(args.data_dir, 'embed_tfidf_weights.pkl')) == True:
-                print("Loading embedding tfidf and weights from file")
-                with open(os.path.join(args.data_dir ,'embed_tfidf_weights.pkl'), 'rb') as f:
-                    w_emb = torch.load(f)
-                print("Load embedding tfidf and weights from file successfully")
-            else:
-                print("Embedding tfidf and weights haven't been saving before")
-                tfidf, weights = tfidf_from_questions(['train'], args, dict)
-                w_emb.init_embedding(os.path.join(args.data_dir, 'glove6b_init_300d.npy'), tfidf, weights)
-                with open(os.path.join(args.data_dir ,'embed_tfidf_weights.pkl'), 'wb') as f:
-                    torch.save(w_emb, f)
-                print("Saving embedding with tfidf and weights successfully")
-    return w_emb
-
-
-def tfidf_from_questions(names, args, dictionary, target=['rad']):
-    inds = [[], []] # rows, cols for uncoalesce sparse matrix
-    df = dict()
-    N = len(dictionary)
-    if args.use_data:
-        dataroot = args.data_dir
-    def populate(inds, df, text):
-        tokens = dictionary.tokenize(text, True)
-        for t in tokens:
-            df[t] = df.get(t, 0) + 1
-        combin = list(itertools.combinations(tokens, 2))
-        for c in combin:
-            if c[0] < N:
-                inds[0].append(c[0]); inds[1].append(c[1])
-            if c[1] < N:
-                inds[0].append(c[1]); inds[1].append(c[0])
-
-    if 'rad' in target:
-        for name in names:
-            assert name in ['train', 'test']
-            question_path = os.path.join(dataroot, name + 'set.json')
-            questions = json.load(open(question_path))
-            for question in questions:
-                populate(inds, df, question['question'])
-
-    # TF-IDF
-    vals = [1] * len(inds[1])
-    for idx, col in enumerate(inds[1]):
-        assert df[col] >= 1, 'document frequency should be greater than zero!'
-        vals[col] /= df[col]
-
-    # Make stochastic matrix
-    def normalize(inds, vals):
-        z = dict()
-        for row, val in zip(inds[0], vals):
-            z[row] = z.get(row, 0) + val
-        for idx, row in enumerate(inds[0]):
-            vals[idx] /= z[row]
-        return vals
-
-    vals = normalize(inds, vals)
-
-    tfidf = torch.sparse.FloatTensor(torch.LongTensor(inds), torch.FloatTensor(vals))
-    tfidf = tfidf.coalesce()
-
-    # Latent word embeddings
-    emb_dim = 300
-    glove_file = os.path.join(dataroot, 'glove.6B', 'glove.6B.%dd.txt' % emb_dim)
-    weights, word2emb = create_glove_embedding_init(dictionary.idx2word[N:], glove_file)
-    print('tf-idf stochastic matrix (%d x %d) is generated.' % (tfidf.size(0), tfidf.size(1)))
-
-    return tfidf,

@@ -4,7 +4,6 @@ from torch.utils.data import DataLoader
 
 from dataset_RAD_group import RADGroupFeatureDataset
 from dataset_SLAKE_group import SLAKEGroupFeatureDataset
-from dataset_SLAKE_star_group import SLAKEStarGroupFeatureDataset
 from model_grouped import model
 from train_grouped import train, test
 
@@ -65,7 +64,7 @@ if __name__ == '__main__':
     # Prepare the dataloader
     if args.dataset_name == "SLAKE":
         train_dataset = SLAKEGroupFeatureDataset('train', args, dataroot=data)
-        val_dataset = SLAKEGroupFeatureDataset('val', args, dataroot=data)
+        val_dataset = SLAKEGroupFeatureDataset('validate', args, dataroot=data)
         test_dataset = SLAKEGroupFeatureDataset('test', args, dataroot=data)
         # train_dataset = SLAKEStarGroupFeatureDataset('train', args, dataroot=data)
         # test_dataset = SLAKEStarGroupFeatureDataset('test', args, dataroot=data)

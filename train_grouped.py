@@ -10,7 +10,6 @@ from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
 
 from dataset_SLAKE_group import SLAKEGroupFeatureDataset
-from dataset_SLAKE_star_group import SLAKEStarGroupFeatureDataset
 from dataset_RAD_group import RADGroupFeatureDataset
 
 

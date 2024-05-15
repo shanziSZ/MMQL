@@ -26,12 +26,17 @@ with open(result_path, "w", encoding='utf-8') as f:
     for k, v in load_estimated_result_p.items():
         preds_0 = torch.softmax(load_estimated_result_0[k], dim=0)
         preds_p = torch.softmax(load_estimated_result_p[k], dim=0)
+
+        # Filter the wrong prompt
         info_gain = Categorical(preds_p).entropy() - Categorical(preds_0).entropy()
         if info_gain > 1e-4:
             v = load_estimated_result_0[k]
         else:
             v = load_estimated_result_p[k]
-        v = (load_estimated_result_0[k] + load_estimated_result_p[k]) / 2
+
+        # Simple soft ensemble
+        # v = (load_estimated_result_0[k] + load_estimated_result_p[k]) / 2
+
         text = str(k) + "," + str(torch.max(v, 0)[1].data) + "," + str(torch.max(torch.softmax(v, 0), 0)[0].data) + "\n"
         f.write(text)
 f.close()

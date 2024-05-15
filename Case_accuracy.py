@@ -90,7 +90,7 @@ def CaseAccuracy(predict_results, test_dataset, dataset_name):
             predict_label = str(predict_results[str(qid)])
             pred_list.append(predict_label)
             gt_list.append(label)
-            print(label, predict_label)
+            # print(label, predict_label)
             if label != predict_label:
                 pass
             else:
@@ -150,8 +150,8 @@ if __name__ == '__main__':
 
     predict_results = {}
     for line in lines:
-        qid = line.split(',tensor')[0].replace("tensor(", "").replace(")", "")
-        label = line.split(',tensor')[1].replace(", device='cuda:0')", "").replace("(", "").replace("\n", "")
+        qid = line.split(',tensor')[0].replace("tensor([", "").replace(".], device='cuda:0')", "")
+        label = line.split(',tensor')[1].replace(", device='cuda:0')", "").replace("(", "").replace(")", "")
 
         predict_results[qid] = str(label)
 

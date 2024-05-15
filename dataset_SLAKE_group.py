@@ -77,7 +77,7 @@ class SLAKEGroupFeatureDataset(Dataset):
         self.name = name
         self.args = args
         self.dataroot = dataroot
-        assert name in ['train', 'test', 'val']
+        assert name in ['train', 'test', 'validate']
 
         # Close & open
         self.label2close = cPickle.load(open(os.path.join('./data-SLAKE/cache/close_ans2labels.pkl'), 'rb'))
