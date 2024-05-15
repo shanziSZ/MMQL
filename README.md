@@ -1,6 +1,7 @@
 Train or test the model:
   1. Install the requirements
-  2. Run main.py for train or test
+  2. Download datasets
+  3. Run main.py for train or test
 
 Error prompt prune:
   1. Result file without using prompt-QA during MQL prediction. The file is provided in "./saved_models/2024Jan26-121420_rebuttal_SLAKE_No_QA/estimate_results.pkl"
