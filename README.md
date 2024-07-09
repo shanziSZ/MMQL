@@ -14,4 +14,4 @@ Case accuracy:
 
 PS:
   1. Remove the lr_decay() if converging is slow.
-  2. The weight are residual operation in model_grouped.py is optional.
+  2. The weight and residual operation in model_grouped.py are optional.
