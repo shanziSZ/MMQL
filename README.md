@@ -11,3 +11,6 @@ Error prompt prune:
 Case accuracy:
   1. Use the result file, such as "flitered_results_*.txt".
   2. It generates the case accuracy.
+
+PS:
+  1. Remove the lr_decay() if converging is slow.
